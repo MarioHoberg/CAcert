@@ -71,14 +71,14 @@
 				continue;
 			}
 			
-			if(substr($line, 0, 7) == "<title>") {
-				$title = "<h3>".str_replace("&amp;#", "&#", recode_string("UTF8..html", str_replace("&amp;", "", trim(substr($line, 7, -8)))))."</h3>\n";
+			if(substr($line, 0, 7) == '<title>') {
+				$title = '<h3>' . preg_replace('/&amp;#/', '&#', recode_string('UTF8..html', preg_replace('/&amp;/', '', trim(substr($line, 7, -8))))) . "</h3>\n";
 			}
-			if(substr($line, 0, 13) == "<description>") {
-				$description = echo "<p>".str_replace("&amp;#", "&#", recode_string("UTF8..html", str_replace("&amp;", "", preg_replace('/^(<![CDATA[)?(.*?)(]]>)?$/', '$2', trim(substr($line, 13, -14))))))."</p>\n";
+			if(substr($line, 0, 13) == '<description>') {
+				$description = '<p>' . preg_replace('/&amp;#/', '&#', recode_string('UTF8..html', preg_replace('/&amp;/', '', preg_replace('/^(<![CDATA[)?(.*?)(]]>)?$/', '$2', trim(substr($line, 13, -14)))))) . "</p>\n";
 			}
-			if(substr($line, 0, 6) == "<link>") {
-				$link = echo "<p>[ <a href='".trim(substr($line, 6, -7))."'>"._("Full Story")."</a> ]</p>\n";
+			if(substr($line, 0, 6) == '<link>') {
+				$link = '<p>[ <a href="' . trim(substr($line, 6, -7)) . '">' . _('Full Story') . "</a> ]</p>\n";
 			}
 		}
 		fclose($fp);
