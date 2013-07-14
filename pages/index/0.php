@@ -28,60 +28,50 @@
 
 
 <div class="newsbox">
-<?
-/*
-	$query = "select *, UNIX_TIMESTAMP(`when`) as `TS` from news order by `when` desc limit 5";
-	$res = mysql_query($query);
-	while($row = mysql_fetch_assoc($res))
-	{
-		echo "<p><b>".date("Y-m-d", $row['TS'])."</b> - ".$row['short']."</p>\n";
-		if($row['story'] != "")
-			echo "<p>[ <a href='news.php?id=".$row['id']."'>"._("Full Story")."</a> ]</p>\n";
-	}
-	if(mysql_num_rows(mysql_query("select * from `news`")) > 2)
-		echo "<p>[ <a href='news.php'>"._("More News Items")."</a> ]</p>";
-*/
-	$rss = "";
+<?php
 	$open = $items = 0;
 	$fp = @fopen("/www/pages/index/feed.rss", "r");
-	if($fp)
-	{
+	if($fp) {
 		echo '<p id="lnews">'._('Latest News').'</p>';
-
-
-		while(!feof($fp))
-			$rss .= trim(fgets($fp, 4096));
-		fclose($fp);
-		$rss = str_replace("><", ">\n<", $rss);
-		$lines = explode("\n", $rss);
-		foreach($lines as $line)
-		{
+		
+		$title = '';
+		$description = '';
+		$link = '';
+		
+		while($line = fgets($fp)) {
 			$line = trim($line);
 
-			if($line != "<item>" && $open == 0)
+			if($line != "<item>" && $open == 0) {
 				continue;
+			}
 
-			if($line == "<item>" && $open == 0)
-			{
+			if($line == "<item>" && $open == 0) {
 				$open = 1;
 				continue;
 			}
 
-			if($line == "</item>" && $open == 1)
-			{
+			if($line == "</item>" && $open == 1) {
 				$items++;
+				$open == 0;
+				echo $title;
+				echo $description;
+				echo $link;
 				if($items >= 3)
 					break;
-				$open == 0;
 				continue;
 			}
-			if(substr($line, 0, 7) == "<title>")
-				echo "<h3>".str_replace("&amp;#", "&#", recode_string("UTF8..html", str_replace("&amp;", "", trim(substr($line, 7, -8)))))."</h3>\n";
-			if(substr($line, 0, 13) == "<description>")
-				echo "<p>".str_replace("&amp;#", "&#", recode_string("UTF8..html", str_replace("&amp;", "", trim(substr($line, 13, -14)))))."</p>\n";
-			if(substr($line, 0, 6) == "<link>")
-				echo "<p>[ <a href='".trim(substr($line, 6, -7))."'>"._("Full Story")."</a> ]</p>\n";
+			
+			if(substr($line, 0, 7) == "<title>") {
+				$title = "<h3>".str_replace("&amp;#", "&#", recode_string("UTF8..html", str_replace("&amp;", "", trim(substr($line, 7, -8)))))."</h3>\n";
+			}
+			if(substr($line, 0, 13) == "<description>") {
+				$description = echo "<p>".str_replace("&amp;#", "&#", recode_string("UTF8..html", str_replace("&amp;", "", preg_replace('/^(<![CDATA[)?(.*?)(]]>)?$/', '$2', trim(substr($line, 13, -14))))))."</p>\n";
+			}
+			if(substr($line, 0, 6) == "<link>") {
+				$link = echo "<p>[ <a href='".trim(substr($line, 6, -7))."'>"._("Full Story")."</a> ]</p>\n";
+			}
 		}
+		fclose($fp);
 	}
 ?>
 [ <a href="http://blog.CAcert.org/"><?=_('More News Items')?></a> ]
