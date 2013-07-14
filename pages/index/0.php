@@ -30,7 +30,7 @@
 <div class="newsbox">
 <?php
 	$open = $items = 0;
-	$fp = @fopen("/www/pages/index/feed.rss", "r");
+	$fp = @fopen("/www/pages/index/feed.rss", "r"); // FIXME: use relative path to allow operation with different document root
 	if($fp) {
 		echo '<p id="lnews">'._('Latest News').'</p>';
 		
@@ -47,17 +47,27 @@
 
 			if($line == "<item>" && $open == 0) {
 				$open = 1;
+				$title = '';
+				$description = '';
+				$link = '';
 				continue;
 			}
 
 			if($line == "</item>" && $open == 1) {
 				$items++;
 				$open == 0;
-				echo $title;
-				echo $description;
-				echo $link;
-				if($items >= 3)
+				if (!empty($title)) {
+					echo $title;
+				}
+				if (!empty($description)) {
+					echo $description;
+				}
+				if (!empty($link)) {
+					echo $link;
+				}
+				if($items >= 3) {
 					break;
+				}
 				continue;
 			}
 			
